@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FastTracker">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>FastTracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ SETUP SCREEN ============ -->
+  <div id="setup-screen" class="screen active">
+    <div class="setup-container">
+      <div class="setup-header">
+        <div class="setup-icon">🔥</div>
+        <h1>FastTracker</h1>
+        <p class="subtitle">Configure your fasting session</p>
+      </div>
+
+      <!-- Duration -->
+      <div class="card">
+        <div class="card-label">⏱ Duration</div>
+        <div class="duration-display">
+          <span id="duration-value" class="big-number">5</span>
+          <span class="unit">Days</span>
+          <span id="duration-hours" class="secondary">(120 Hours)</span>
+        </div>
+        <input type="range" id="duration-slider" min="1" max="7" value="5" step="1">
+        <div class="quick-picks">
+          <button class="chip" data-days="1">1d</button>
+          <button class="chip" data-days="2">2d</button>
+          <button class="chip" data-days="3">3d</button>
+          <button class="chip active" data-days="5">5d</button>
+          <button class="chip" data-days="7">7d</button>
+        </div>
+      </div>
+
+      <!-- Body Stats -->
+      <div class="card">
+        <div class="card-label">📐 Body Stats</div>
+        <div class="unit-toggle">
+          <button id="btn-metric" class="toggle-btn active">Metric</button>
+          <button id="btn-imperial" class="toggle-btn">Imperial</button>
+        </div>
+
+        <div class="gender-toggle">
+          <button id="btn-male" class="toggle-btn active">Male</button>
+          <button id="btn-female" class="toggle-btn">Female</button>
+        </div>
+
+        <div class="input-row">
+          <label>Weight</label>
+          <div class="input-group">
+            <input type="number" id="weight-input" value="80" inputmode="decimal">
+            <span id="weight-unit" class="input-unit">kg</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <label>Height</label>
+          <div class="input-group">
+            <input type="number" id="height-input" value="175" inputmode="decimal">
+            <span id="height-unit" class="input-unit">cm</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <label>Age</label>
+          <div class="input-group">
+            <input type="number" id="age-input" value="30" inputmode="numeric">
+            <span class="input-unit">yrs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Level -->
+      <div class="card">
+        <div class="card-label">🏃 Activity Level</div>
+        <div class="activity-options">
+          <button class="activity-btn active" data-level="sedentary" data-mult="1.2">
+            <strong>Sedentary</strong>
+            <span>Little or no exercise, desk job</span>
+          </button>
+          <button class="activity-btn" data-level="light" data-mult="1.375">
+            <strong>Lightly Active</strong>
+            <span>Light exercise 1-3 days/week</span>
+          </button>
+          <button class="activity-btn" data-level="moderate" data-mult="1.55">
+            <strong>Moderately Active</strong>
+            <span>Moderate exercise 3-5 days/week</span>
+          </button>
+          <button class="activity-btn" data-level="active" data-mult="1.725">
+            <strong>Very Active</strong>
+            <span>Hard exercise 6-7 days/week</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="card preview-card">
+        <div class="card-label">📊 Estimated Results</div>
+        <div class="preview-stats">
+          <div class="preview-stat">
+            <span id="preview-daily" class="big-number small">1920</span>
+            <span class="unit">kcal/day</span>
+          </div>
+          <div class="preview-stat">
+            <span id="preview-total" class="big-number small">8928</span>
+            <span class="unit">total kcal</span>
+          </div>
+          <div class="preview-stat">
+            <span id="preview-weight" class="big-number small">2.8</span>
+            <span id="preview-weight-unit" class="unit">kg loss</span>
+          </div>
+        </div>
+        <p class="disclaimer">Estimates based on Mifflin-St Jeor equation. Actual results vary.</p>
+      </div>
+
+      <button id="start-btn" class="primary-btn">🔥 Begin Fast</button>
+    </div>
+  </div>
+
+  <!-- ============ MAIN APP (tabs) ============ -->
+  <div id="app-screen" class="screen">
+
+    <!-- Tab Content -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="scroll-area">
+        <!-- Timer Ring -->
+        <div class="card timer-card">
+          <div class="ring-container">
+            <svg class="progress-ring" viewBox="0 0 200 200">
+              <circle class="ring-bg" cx="100" cy="100" r="88" />
+              <circle id="ring-progress" class="ring-fg" cx="100" cy="100" r="88"
+                stroke-dasharray="553" stroke-dashoffset="553" />
+            </svg>
+            <div class="ring-center">
+              <div id="elapsed-time" class="elapsed-time">0h 00m 00s</div>
+              <div id="progress-pct" class="progress-pct">0%</div>
+              <div class="progress-label">Complete</div>
+            </div>
+          </div>
+          <div class="timer-meta">
+            <span>⏱ Remaining: <strong id="remaining-time">5d 0h 0m</strong></span>
+          </div>
+          <div class="timer-meta">
+            <span>📅 Ends: <strong id="end-date">--</strong></span>
+          </div>
+          <button id="edit-times-btn" class="edit-times-btn">✏️ Edit Times</button>
+        </div>
+
+        <!-- Phase -->
+        <div class="card phase-card">
+          <div class="phase-left">
+            <span class="phase-icon">⚡</span>
+            <div>
+              <div class="phase-subtitle">Current Phase</div>
+              <div id="current-phase" class="phase-name">Fed State</div>
+            </div>
+          </div>
+          <div id="current-day" class="phase-day">Day 1</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon orange">🔥</div>
+            <div id="stat-calories" class="stat-value">0</div>
+            <div class="stat-unit">kcal</div>
+            <div class="stat-label">Calories Burned</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">⚖️</div>
+            <div id="stat-weightkg" class="stat-value">0.0</div>
+            <div class="stat-unit">kg lost</div>
+            <div class="stat-label">Weight Lost</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">⚖️</div>
+            <div id="stat-weightlbs" class="stat-value">0.0</div>
+            <div class="stat-unit">lbs lost</div>
+            <div class="stat-label">Weight Lost</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">📊</div>
+            <div id="stat-daily" class="stat-value">0</div>
+            <div class="stat-unit">kcal/day</div>
+            <div class="stat-label">Daily Burn Rate</div>
+          </div>
+        </div>
+
+        <!-- Fuel Sources -->
+        <div class="card">
+          <div class="card-label">⛽ Energy Sources</div>
+          <div class="fuel-row">
+            <span class="fuel-label">Glucose</span>
+            <div class="fuel-bar-track"><div id="fuel-glucose" class="fuel-bar blue" style="width:70%"></div></div>
+            <span id="fuel-glucose-pct" class="fuel-pct">70%</span>
+          </div>
+          <div class="fuel-row">
+            <span class="fuel-label">Fat</span>
+            <div class="fuel-bar-track"><div id="fuel-fat" class="fuel-bar orange" style="width:25%"></div></div>
+            <span id="fuel-fat-pct" class="fuel-pct">25%</span>
+          </div>
+          <div class="fuel-row">
+            <span class="fuel-label">Ketones</span>
+            <div class="fuel-bar-track"><div id="fuel-ketones" class="fuel-bar purple" style="width:5%"></div></div>
+            <span id="fuel-ketones-pct" class="fuel-pct">5%</span>
+          </div>
+        </div>
+
+        <!-- Next Event -->
+        <div id="next-event-card" class="card next-event-card">
+          <div class="next-event-header">
+            <span class="card-label">🔮 Coming Up Next</span>
+            <span id="next-event-eta" class="event-eta">in ~4h</span>
+          </div>
+          <div class="next-event-body">
+            <div id="next-event-icon" class="event-icon-circle">⏳</div>
+            <div>
+              <div id="next-event-title" class="next-event-title">--</div>
+              <div id="next-event-desc" class="next-event-desc">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- End Fast -->
+        <button id="end-fast-btn" class="end-btn">⏹ End Fast</button>
+      </div>
+    </div>
+
+    <div id="tab-timeline" class="tab-content">
+      <div class="scroll-area">
+        <div class="timeline-header">
+          <h2>Physiological Timeline</h2>
+          <span id="events-count" class="events-count">0/22</span>
+        </div>
+        <div class="filter-chips" id="filter-chips">
+          <button class="filter-chip active" data-filter="all">All</button>
+          <button class="filter-chip" data-filter="metabolic">Metabolic</button>
+          <button class="filter-chip" data-filter="cellular">Cellular</button>
+          <button class="filter-chip" data-filter="hormonal">Hormonal</button>
+          <button class="filter-chip" data-filter="neurological">Neurological</button>
+          <button class="filter-chip" data-filter="immune">Immune</button>
+        </div>
+        <div id="timeline-list" class="timeline-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-stats" class="tab-content">
+      <div class="scroll-area">
+
+        <!-- Weight Detail -->
+        <div class="card">
+          <div class="card-label">⚖️ Weight Tracking</div>
+          <div class="weight-flow">
+            <div class="weight-box">
+              <div class="weight-box-label">Starting</div>
+              <div id="stats-start-weight" class="weight-box-value">80.0</div>
+              <div id="stats-start-weight-unit" class="weight-box-unit">kg</div>
+            </div>
+            <div class="weight-arrow">→</div>
+            <div class="weight-box">
+              <div class="weight-box-label">Estimated Now</div>
+              <div id="stats-current-weight" class="weight-box-value green">78.5</div>
+              <div id="stats-current-weight-unit" class="weight-box-unit">kg</div>
+            </div>
+            <div class="weight-arrow">↓</div>
+            <div class="weight-box">
+              <div class="weight-box-label">Lost</div>
+              <div id="stats-lost-weight" class="weight-box-value orange">-1.5</div>
+              <div id="stats-lost-weight-unit" class="weight-box-unit">kg</div>
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="card-label" style="margin-bottom:8px;">Weight Loss Breakdown</div>
+          <div class="breakdown-row">
+            <span class="dot blue"></span>
+            <span>Water weight</span>
+            <span id="stats-water-loss" class="breakdown-val">0.0 kg</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="dot orange"></span>
+            <span>Fat loss</span>
+            <span id="stats-fat-loss" class="breakdown-val">0.0 kg</span>
+          </div>
+        </div>
+
+        <!-- Calories Detail -->
+        <div class="card">
+          <div class="card-label">🔥 Calorie Burn</div>
+          <div class="cal-hero">
+            <span id="stats-total-cal" class="big-number">0</span>
+            <span class="unit">Total kcal burned</span>
+          </div>
+          <div class="cal-meta">
+            <div>Daily rate: <strong id="stats-daily-rate">0</strong> kcal</div>
+            <div>Hourly rate: <strong id="stats-hourly-rate">0</strong> kcal</div>
+            <div>BMR: <strong id="stats-bmr">0</strong> kcal</div>
+          </div>
+          <hr class="divider">
+          <div class="card-label" style="margin-bottom:8px;">Daily Breakdown</div>
+          <div id="stats-daily-breakdown"></div>
+        </div>
+
+        <!-- Metabolic -->
+        <div class="card">
+          <div class="card-label">🧪 Metabolic State</div>
+          <div class="metabolic-row">
+            <span>Estimated Blood Ketones</span>
+            <span id="stats-ketones" class="purple bold">~0.1 mmol/L</span>
+          </div>
+          <div class="metabolic-row">
+            <span>Ketosis Level</span>
+            <span id="stats-ketosis-level" class="secondary">Not in ketosis</span>
+          </div>
+          <hr class="divider">
+          <div class="card-label" style="margin-bottom:8px;">Key Insights</div>
+          <div class="insight-row">
+            <span>🔥 Fat Burned</span>
+            <span id="stats-fat-grams" class="bold">~0 g</span>
+          </div>
+          <div class="insight-row">
+            <span>⚡ Metabolic Rate</span>
+            <span id="stats-metabolic-rate" class="bold">~100% baseline</span>
+          </div>
+          <div class="insight-row">
+            <span>📈 Growth Hormone</span>
+            <span id="stats-hgh" class="bold purple">~1x baseline</span>
+          </div>
+          <div class="insight-row">
+            <span>💉 Insulin Level</span>
+            <span id="stats-insulin" class="bold">Decreasing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="dashboard">
+        <span class="tab-icon">⏱</span>
+        <span class="tab-label">Dashboard</span>
+      </button>
+      <button class="tab" data-tab="timeline">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">Timeline</span>
+      </button>
+      <button class="tab" data-tab="stats">
+        <span class="tab-icon">📊</span>
+        <span class="tab-label">Stats</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
