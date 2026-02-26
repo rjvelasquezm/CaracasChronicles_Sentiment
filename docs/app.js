@@ -561,6 +561,63 @@ function initEndFast() {
   });
 }
 
+// ---------- EDIT TIMES ----------
+function initEditTimes() {
+  $('#edit-times-btn').addEventListener('click', () => {
+    if (!state) return;
+
+    const startDate = new Date(state.startTime);
+    const endDate = new Date(state.startTime + state.durationDays * 24 * 3600 * 1000);
+
+    const fmt = d => {
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, '0');
+      const da = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${y}-${mo}-${da}T${h}:${mi}`;
+    };
+
+    const overlay = document.createElement('div');
+    overlay.className = 'edit-overlay';
+    overlay.innerHTML = `
+      <div class="edit-box">
+        <h3>Edit Times</h3>
+        <div class="edit-field">
+          <label>Start Time</label>
+          <input type="datetime-local" id="edit-start" value="${fmt(startDate)}">
+        </div>
+        <div class="edit-field">
+          <label>End Time</label>
+          <input type="datetime-local" id="edit-end" value="${fmt(endDate)}">
+        </div>
+        <div class="edit-actions">
+          <button class="btn-edit-cancel">Cancel</button>
+          <button class="btn-edit-save">Save</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.btn-edit-cancel').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('.btn-edit-save').addEventListener('click', () => {
+      const newStart = new Date(overlay.querySelector('#edit-start').value).getTime();
+      const newEnd = new Date(overlay.querySelector('#edit-end').value).getTime();
+
+      if (!newStart || !newEnd || newEnd <= newStart) {
+        alert('End time must be after start time.');
+        return;
+      }
+
+      state.startTime = newStart;
+      state.durationDays = (newEnd - newStart) / (24 * 3600 * 1000);
+      saveState();
+      overlay.remove();
+      tick();
+      buildTimeline();
+    });
+  });
+}
+
 // ---------- NOTIFICATIONS ----------
 function requestNotificationPermission() {
   if ('Notification' in window && Notification.permission === 'default') {
@@ -625,6 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initFilters();
   initEndFast();
+  initEditTimes();
 
   // Resume existing session
   if (loadState()) {
