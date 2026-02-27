@@ -1,10 +1,11 @@
-const CACHE_NAME = 'fasttracker-v1';
+const CACHE_NAME = 'fasttracker-v2';
+const BASE = '/CaracasChronicles_Sentiment/';
 const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json'
+  BASE,
+  BASE + 'index.html',
+  BASE + 'style.css',
+  BASE + 'app.js',
+  BASE + 'manifest.json'
 ];
 
 self.addEventListener('install', e => {
