@@ -33,6 +33,7 @@
 
 | Date | Exercise Type | Duration | Weight (lbs) | Eating (1-10) | Notes |
 |------|--------------|----------|-------------|---------------|-------|
+| 2026-03-28 (Sat) | Kettlebell | 30 min | -- | -- | Logged retroactively |
 | 2026-03-29 (Sun) | Rucking (35 lbs) | 40 min | 180.4 | 8 | Baseline weigh-in. Bonus ruck on rest day. |
 
 ## Monthly Body Fat
@@ -41,8 +42,8 @@
 |-------|-----------|-----------|----------|--------|-------|
 
 ## Streaks
-- Current exercise streak: 1 day
-- Longest exercise streak: 1 day
+- Current exercise streak: 2 days
+- Longest exercise streak: 2 days
 - Current weigh-in streak: 1 day
 
 ## Supplement Stack
