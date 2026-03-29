@@ -19,6 +19,11 @@ final class AudioManager: NSObject, ObservableObject {
     private var tonePlayer: AVAudioPlayer?
     private let speechSynthesizer = AVSpeechSynthesizer()
 
+    // Sine-wave tone engine — avoids unreliable system sound IDs
+    private let toneEngine = AVAudioEngine()
+    private let toneNode   = AVAudioPlayerNode()
+    private var toneEngineReady = false
+
     // Preferred voice: calm, slow, natural
     private var preferredVoice: AVSpeechSynthesisVoice? {
         let preferred = ["com.apple.ttsbundle.siri_female_en-US_compact",
@@ -33,6 +38,7 @@ final class AudioManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         configureAudioSession()
+        setupToneEngine()
     }
 
     // MARK: - Audio Session
@@ -90,15 +96,20 @@ final class AudioManager: NSObject, ObservableObject {
     /// Speak the breathing phase instruction aloud.
     func speakPhase(_ phase: BreathingPhaseType, duration: Double) {
         guard isVoiceEnabled else { return }
-        speechSynthesizer.stopSpeaking(at: .immediate)
 
-        let utterance = AVSpeechUtterance(string: phase.instruction)
-        utterance.voice = preferredVoice
-        utterance.rate = 0.38        // slow and soothing
-        utterance.pitchMultiplier = 0.92
-        utterance.volume = cueVolume
-        utterance.preUtteranceDelay = 0.1
-        speechSynthesizer.speak(utterance)
+        let instruction = phase.instruction
+        // Stop any current speech, then allow one runloop cycle before enqueueing
+        // the next utterance — avoids the synthesizer silently discarding it.
+        speechSynthesizer.stopSpeaking(at: .immediate)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let utterance = AVSpeechUtterance(string: instruction)
+            utterance.voice = self.preferredVoice
+            utterance.rate = 0.38
+            utterance.pitchMultiplier = 0.92
+            utterance.volume = self.cueVolume
+            self.speechSynthesizer.speak(utterance)
+        }
     }
 
     /// Speak a custom message.
@@ -118,44 +129,90 @@ final class AudioManager: NSObject, ObservableObject {
         speechSynthesizer.stopSpeaking(at: .immediate)
     }
 
+    // MARK: - Tone Engine Setup
+
+    private func setupToneEngine() {
+        toneEngine.attach(toneNode)
+        let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+        toneEngine.connect(toneNode, to: toneEngine.mainMixerNode, format: format)
+        do {
+            try toneEngine.start()
+            toneEngineReady = true
+        } catch {
+            print("AudioManager: Tone engine failed to start — \(error)")
+        }
+    }
+
     // MARK: - Transition Tones
 
-    /// Play a soft bell tone at phase transitions.
+    /// Play a soft tone at each phase transition.
+    /// Uses bundled audio files if present, otherwise synthesizes a sine-wave tone
+    /// at a phase-appropriate pitch (reliable across all devices/volumes).
     func playTransitionTone(for phase: BreathingPhaseType) {
         guard isToneEnabled else { return }
 
-        // Try to play a bundled sound file first
         let toneName: String
         switch phase {
-        case .inhale: toneName = "tone_inhale"
-        case .exhale: toneName = "tone_exhale"
+        case .inhale:     toneName = "tone_inhale"
+        case .exhale:     toneName = "tone_exhale"
         case .holdFull, .holdEmpty: toneName = "tone_hold"
         }
 
         if let url = Bundle.main.url(forResource: toneName, withExtension: "wav") ??
-                     Bundle.main.url(forResource: toneName, withExtension: "mp3") {
-            do {
-                tonePlayer = try AVAudioPlayer(contentsOf: url)
-                tonePlayer?.volume = cueVolume * 0.7
-                tonePlayer?.play()
-            } catch {
-                playSystemTone(for: phase)
-            }
+                     Bundle.main.url(forResource: toneName, withExtension: "mp3"),
+           let player = try? AVAudioPlayer(contentsOf: url) {
+            tonePlayer = player
+            tonePlayer?.volume = cueVolume * 0.7
+            tonePlayer?.play()
         } else {
-            playSystemTone(for: phase)
+            playSynthesizedTone(for: phase)
         }
     }
 
-    /// Fallback: use AudioServicesPlaySystemSound for a subtle click/tick
-    private func playSystemTone(for phase: BreathingPhaseType) {
-        // System sound IDs: 1057 (tock), 1104 (key click), 1306 (lock)
-        let soundID: SystemSoundID
+    /// Generate and play a brief sine-wave bell tone at a phase-specific pitch.
+    /// This is the reliable fallback — no system sound IDs, no missing files.
+    private func playSynthesizedTone(for phase: BreathingPhaseType) {
+        guard toneEngineReady else { return }
+
+        // Frequencies chosen for a calming, musical quality
+        let frequency: Float
         switch phase {
-        case .inhale: soundID = 1057
-        case .exhale: soundID = 1052
-        case .holdFull, .holdEmpty: soundID = 1000
+        case .inhale:     frequency = 528   // ascending — "opening"
+        case .exhale:     frequency = 396   // descending — "releasing"
+        case .holdFull:   frequency = 440   // steady — "neutral"
+        case .holdEmpty:  frequency = 369   // low — "empty"
         }
-        AudioServicesPlaySystemSound(soundID)
+
+        let sampleRate: Double = 44100
+        let duration: Double   = 0.55        // tone length in seconds
+        let fadeFrames         = Int(sampleRate * 0.07)  // 70 ms fade in/out
+        let frameCount         = AVAudioFrameCount(sampleRate * duration)
+        let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
+
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else { return }
+        buffer.frameLength = frameCount
+
+        let data      = buffer.floatChannelData![0]
+        let amplitude = cueVolume * 0.30     // moderate volume, not startling
+        let twoPiF    = 2.0 * Float.pi * frequency
+
+        for i in 0..<Int(frameCount) {
+            var sample = sin(twoPiF * Float(i) / Float(sampleRate)) * amplitude
+            // Fade in
+            if i < fadeFrames {
+                sample *= Float(i) / Float(fadeFrames)
+            }
+            // Fade out
+            let fadeOutStart = Int(frameCount) - fadeFrames
+            if i > fadeOutStart {
+                sample *= Float(Int(frameCount) - i) / Float(fadeFrames)
+            }
+            data[i] = sample
+        }
+
+        toneNode.stop()
+        toneNode.scheduleBuffer(buffer, at: nil, options: .interrupts)
+        toneNode.play()
     }
 
     // MARK: - Session Lifecycle
