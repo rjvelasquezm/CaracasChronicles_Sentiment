@@ -34,7 +34,7 @@
 | Date | Exercise Type | Duration | Weight (lbs) | Eating (1-10) | Notes |
 |------|--------------|----------|-------------|---------------|-------|
 | 2026-03-28 (Sat) | Kettlebell | 30 min | -- | -- | Logged retroactively |
-| 2026-03-29 (Sun) | Rucking (35 lbs) | 40 min | 180.4 | 8 | Baseline weigh-in. Bonus ruck on rest day. |
+| 2026-03-29 (Sun) | Rucking (35 lbs) | 40 min | 180.4 | 7.5 | Baseline weigh-in. Bonus ruck on rest day. |
 
 ## Monthly Body Fat
 
@@ -53,6 +53,7 @@
 - Cognizin
 - Psyllium husk (Metamucil Sugar-Free) in water
 - Lite Salt pinch in water
+- L-Theanine 200mg (with coffee)
 
 ### Lunch (With Food)
 - D3 + K2
@@ -72,3 +73,6 @@
 ### Daily (Timing Flexible)
 - Creatine 5g
 - Electrolytes (Lite Salt in water + Magtein at night)
+
+### Tactical (1-2x/week max, before 7am)
+- Armodafinil 75mg (pending script)
