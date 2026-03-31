@@ -35,6 +35,8 @@
 |------|--------------|----------|-------------|---------------|-------|
 | 2026-03-28 (Sat) | Kettlebell | 30 min | -- | -- | Logged retroactively |
 | 2026-03-29 (Sun) | Rucking (35 lbs) | 40 min | 180.4 | 7.5 | Baseline weigh-in. Bonus ruck on rest day. |
+| 2026-03-30 (Mon) | Kettlebell | 30 min | 181.0 | -- | |
+| 2026-03-31 (Tue) | -- | -- | 180.8 | -- | Rucking day. Fisetin day 1 (500mg w/ fat at lunch). |
 
 ## Monthly Body Fat
 
@@ -42,9 +44,9 @@
 |-------|-----------|-----------|----------|--------|-------|
 
 ## Streaks
-- Current exercise streak: 2 days
-- Longest exercise streak: 2 days
-- Current weigh-in streak: 1 day
+- Current exercise streak: 3 days
+- Longest exercise streak: 3 days
+- Current weigh-in streak: 3 days
 
 ## Supplement Stack
 ### Morning (Fasted / With Coffee)
@@ -64,7 +66,7 @@
 
 ### Night (Before Bed)
 - Magtein
-- Lion's Mane
+- Erinamax (replacing Lion's Mane)
 - Lithium Orotate 5mg
 
 ### Monthly Pulse (2 Consecutive Days)
