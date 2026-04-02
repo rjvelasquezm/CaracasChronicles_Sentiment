@@ -24,10 +24,13 @@
 - Weigh in every morning: wake up, bathroom, scale.
 - Eating window: ~12pm-9pm (16:8 IF)
 
-## Baseline
+## Stats
+- Height: 5'10" (70 in)
 - Starting weight: 180.4 lbs (2026-03-29)
 - Goal weight: TBD
-- Body fat baseline: TBD (first tape measurement pending)
+- Starting body fat: ~18.5% (Navy method)
+- Lean mass: ~147 lbs
+- Fat mass: ~33 lbs
 
 ## Daily Log
 
@@ -36,17 +39,20 @@
 | 2026-03-28 (Sat) | Kettlebell | 30 min | -- | -- | Logged retroactively |
 | 2026-03-29 (Sun) | Rucking (35 lbs) | 40 min | 180.4 | 7.5 | Baseline weigh-in. Bonus ruck on rest day. |
 | 2026-03-30 (Mon) | Kettlebell | 30 min | 181.0 | 8 | |
-| 2026-03-31 (Tue) | Rucking (35 lbs) | 30 min | 180.8 | 6.5 | Fisetin day 1 (500mg w/ fat at lunch). Didn't feel like it, did it anyway. |
+| 2026-03-31 (Tue) | Rucking (35 lbs) | 30 min | 180.8 | 6.5 | Fisetin day 1. Didn't feel like it, did it anyway. |
+| 2026-04-01 (Wed) | Rucking (35 lbs) | 30 min | 180.0 | 7 | Fisetin day 2. Swapped KB for ruck - outside with Santiago. |
+| 2026-04-02 (Thu) | -- | -- | 180.6 | -- | Kettlebell day (swapped from ruck). |
 
 ## Monthly Body Fat
 
-| Month | Body Fat % | Waist (in) | Neck (in) | Method | Notes |
-|-------|-----------|-----------|----------|--------|-------|
+| Month | Body Fat % | Neck (in) | Waist (in) | Weight (lbs) | Lean Mass (lbs) | Fat Mass (lbs) |
+|-------|-----------|----------|-----------|-------------|----------------|---------------|
+| Apr 2026 (baseline) | 18.5% | 14.5 | 34 | 180.4 | ~147 | ~33 |
 
 ## Streaks
-- Current exercise streak: 4 days
-- Longest exercise streak: 4 days
-- Current weigh-in streak: 3 days
+- Current exercise streak: 5 days
+- Longest exercise streak: 5 days
+- Current weigh-in streak: 5 days
 
 ## Supplement Stack
 ### Morning (Fasted / With Coffee)
